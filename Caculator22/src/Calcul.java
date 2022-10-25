@@ -1,23 +1,21 @@
+import java.io.IOException;
 import java.util.Scanner;
 
-public class Main {
-    public static void main(String[] args) {
-        //2+3
-        //X+V=XV
+public class Calcul {
+    public static String calc(String inp) throws IOException {
         Converter converter = new Converter();
         String[] actions = {"+", "-", "/", "*"};
         String[] regexActions = {"\\+", "-", "/", "\\*"};
-        Scanner scn = new Scanner(System.in);
-        System.out.print("Введите выражение: ");
-        String exp = scn.nextLine();
+//        Scanner scn = new Scanner(System.in);
+        String exp = inp;
         //Определяем арифметическое действие:
         int actionIndex=-1;
         int r = 0;
         for (int i = 0; i < actions.length; i++) {
             if (exp.contains(",") || exp.contains(".")){
-                System.out.println("Пользователь ввел не целое число");
-                return;
+                throw new IOException("Пользователь ввел не целое число");
             }
+
             else if(exp.contains(actions[i])){
                 actionIndex = i;
                 r = r+1;
@@ -25,20 +23,17 @@ public class Main {
         }
         //Если не нашли арифметического действия, завершаем программу
         if(actionIndex==-1){
-            System.out.println("Некорректное выражение");
-            return;
+            throw new IOException("Пользователь ввел не корректное выражение");
         }
         if(r >1){
-            System.out.println("формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-            return;
+            throw new IOException("формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
         }
         //Делим строчку по найденному арифметическому знаку
         String[]data = exp.split(regexActions[actionIndex]);
         data[0] = data[0].trim();
         data[1] = data[1].trim();
         if (data.length > 2) {
-            System.out.println("т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-            return;
+            throw new IOException("т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
         }
         //Определяем, находятся ли числа в одном формате (оба римские или оба арабские)
         if(converter.isRoman(data[0]) == converter.isRoman(data[1])){
@@ -50,14 +45,11 @@ public class Main {
                 a = converter.romanToInt(data[0]);
                 b = converter.romanToInt(data[1]);
                 if (a > 10 || b > 10) {
-                    System.out.println("Пользователь ввел число больше 10");
-                    return;
+                    throw new IOException("Пользователь ввел число больше 10");
                 } if (a < b && actionIndex == 1){
-                    System.out.println("В римской системе нет отприцательных чисел");
-                    return;
+                    throw new IOException("В римской системе нет отприцательных чисел");
                 } if (a == b && actionIndex == 1){
-                    System.out.println("В римской системе нет 0");
-                    return;
+                    throw new IOException("В римской системе нет 0");
                 }
 
             }else{
@@ -65,8 +57,7 @@ public class Main {
                 a = Integer.parseInt(data[0]);
                 b = Integer.parseInt(data[1]);
                 if (a > 10 || b > 10){
-                    System.out.println("Пользователь ввел число больше 10");
-                    return;
+                    throw new IOException("Пользователь ввел число больше 10");
                 }
             }
             //выполняем с числами арифметическое действие
@@ -87,16 +78,17 @@ public class Main {
             }
             if(isRoman){
                 //если числа были римские, возвращаем результат в римском числе
-                System.out.println(converter.intToRoman(result));
+                String res = converter.intToRoman(result);
+                return res;
             }
             else{
                 //если числа были арабские, возвращаем результат в арабском числе
-                System.out.println(result);
+                String res = Integer.toString(result);
+                return res;
             }
         }else{
-            System.out.println("Числа должны быть в одном формате");
+            throw new IOException("Числа должны быть в одном формате");
         }
-
 
     }
 }
